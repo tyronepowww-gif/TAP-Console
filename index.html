@@ -5,7 +5,7 @@
 <meta name="viewport"
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-<title>TAP Core V2</title>
+<title>TAP Core V2.1</title>
 
 <style>
 *{
@@ -18,7 +18,7 @@ html,body{
   min-height:100%;
   background:#111;
   color:#eee;
-  font-family:monospace;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
 body{
@@ -28,135 +28,203 @@ body{
 }
 
 #app{
-  width:min(430px,100%);
-}
-
-h1{
-  text-align:center;
-  margin:4px 0 12px;
-  font-size:20px;
-  letter-spacing:3px;
+  width:min(100%,480px);
 }
 
 .device{
-  background:#202020;
+  background:#242424;
   border:2px solid #444;
   border-radius:28px;
   padding:18px;
-  box-shadow:0 15px 45px #000;
+  box-shadow:0 20px 50px #000;
+}
+
+.brand{
+  text-align:center;
+  font-weight:900;
+  letter-spacing:5px;
+  margin-bottom:12px;
 }
 
 .screen{
-  min-height:250px;
-  background:#cfd7c3;
-  color:#172016;
+  background:#b8c7a1;
+  color:#142015;
+  min-height:230px;
   border:8px solid #111;
   border-radius:10px;
-  padding:18px;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  font-size:15px;
+  padding:14px;
+  font-family:monospace;
+  font-size:14px;
   line-height:1.35;
-  box-shadow:inset 0 0 20px #0004;
+  white-space:pre-wrap;
+  overflow:auto;
+  word-break:break-word;
 }
 
 .status{
-  text-align:center;
-  min-height:16px;
-  margin:8px 0;
-  font-size:11px;
+  min-height:18px;
+  margin:8px 2px;
   color:#aaa;
+  font-size:12px;
+  text-align:center;
 }
 
 .buttons{
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:8px;
-  margin-top:14px;
-}
-
-button{
-  min-height:58px;
-  border:2px solid #555;
-  border-radius:50%;
-  background:#333;
-  color:#fff;
-  font-family:monospace;
-  font-size:9px;
-  font-weight:bold;
-  padding:3px;
-  overflow:hidden;
-}
-
-button:active{
-  transform:scale(.94);
-  background:#555;
-}
-
-.system{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:14px;
-}
-
-.system button{
-  min-height:42px;
-  border-radius:8px;
-  font-size:11px;
-}
-
-.panel{
-  background:#181818;
-  border:1px solid #333;
-  border-radius:12px;
-  padding:12px;
   margin-top:12px;
 }
 
-.panel input,
-.panel textarea{
-  width:100%;
-  background:#090909;
+.physical{
+  aspect-ratio:1;
+  border:0;
+  border-radius:50%;
+  background:#555;
   color:#fff;
-  border:1px solid #555;
-  border-radius:7px;
-  padding:10px;
-  font-family:monospace;
-  margin-bottom:8px;
+  font-weight:800;
+  font-size:11px;
+  padding:4px;
+  box-shadow:
+    inset 0 -4px 0 #333,
+    0 3px 5px #000;
+  overflow:hidden;
 }
 
-.panel textarea{
-  min-height:150px;
-  resize:vertical;
+.physical:active{
+  transform:translateY(2px);
+  box-shadow:inset 0 -2px 0 #333;
 }
 
-.panel button{
+.physical:disabled{
+  opacity:.25;
+}
+
+.panel{
+  margin-top:14px;
+  background:#191919;
+  border:1px solid #383838;
+  border-radius:14px;
+  padding:12px;
+}
+
+.panel h2{
+  margin:0 0 10px;
+  font-size:14px;
+}
+
+input,textarea{
   width:100%;
-  min-height:42px;
-  border-radius:7px;
-  margin-top:5px;
+  border:1px solid #444;
+  background:#0d0d0d;
+  color:#eee;
+  border-radius:8px;
+  padding:10px;
+  outline:none;
+}
+
+textarea{
+  min-height:180px;
+  resize:vertical;
+  font-family:monospace;
+  font-size:12px;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.row>*{
+  flex:1;
+}
+
+button.action{
+  border:1px solid #555;
+  background:#2d2d2d;
+  color:#fff;
+  border-radius:8px;
+  padding:10px;
+  font-weight:700;
+}
+
+button.action:active{
+  transform:translateY(1px);
 }
 
 .hidden{
   display:none;
 }
 
+.library{
+  max-height:300px;
+  overflow-y:auto;
+  border:1px solid #333;
+  border-radius:8px;
+  background:#0d0d0d;
+}
+
+.cart{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px;
+  border-bottom:1px solid #292929;
+}
+
+.cart:last-child{
+  border-bottom:0;
+}
+
+.cart-name{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:700;
+}
+
+.cart-actions{
+  display:flex;
+  gap:5px;
+  flex-shrink:0;
+}
+
 .small{
-  font-size:10px;
-  color:#999;
+  border:1px solid #444;
+  background:#252525;
+  color:#fff;
+  border-radius:6px;
+  padding:6px 8px;
+  font-size:11px;
+}
+
+.empty{
+  padding:20px;
+  text-align:center;
+  color:#777;
+}
+
+.note{
+  color:#888;
+  font-size:11px;
   line-height:1.4;
   margin-top:8px;
 }
 
-.ok{
-  color:#9f9;
-  white-space:pre-wrap;
+.warning{
+  color:#d9b86c;
 }
 
-.err{
-  color:#f88;
-  white-space:pre-wrap;
+.danger{
+  color:#d77;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #333;
+  margin:12px 0;
 }
 </style>
 </head>
@@ -165,48 +233,20 @@ button:active{
 
 <div id="app">
 
-<h1>TAP CORE V2</h1>
+  <div class="device">
 
-<div class="device">
+    <div class="brand">TAP</div>
 
-  <div id="screen" class="screen">
-    BOOTING TAP...
-  </div>
+    <div id="screen" class="screen">BOOTING TAP...</div>
 
-  <div id="status" class="status"></div>
+    <div id="status" class="status"></div>
 
-  <div id="buttons" class="buttons">
-
-    <button data-i="0">—</button>
-    <button data-i="1">—</button>
-    <button data-i="2">—</button>
-    <button data-i="3">—</button>
-    <button data-i="4">—</button>
+    <div id="buttons" class="buttons"></div>
 
   </div>
 
-  <div class="system">
-
-    <button id="homeBtn">
-      HOME
-    </button>
-
-    <button id="powerBtn">
-      POWER
-    </button>
-
-  </div>
-
-</div>
-
-
-<div class="panel">
-
-  <button id="openImport">
-    IMPORT CARTRIDGE
-  </button>
-
-  <div id="importPanel" class="hidden">
+  <div class="panel">
+    <h2>CARTRIDGE IMPORT</h2>
 
     <input
       id="cartName"
@@ -215,23 +255,71 @@ button:active{
 
     <textarea
       id="cartCode"
-      placeholder="Paste cartridge JavaScript here"></textarea>
+      maxlength="50000"
+      placeholder="Paste cartridge JavaScript here..."></textarea>
 
-    <button id="installBtn">
-      VALIDATE + INSTALL
-    </button>
+    <div class="row">
+      <button class="action" id="installBtn">
+        INSTALL
+      </button>
 
-    <div class="small">
-      Cartridge code executes through the TAP API.
-      Browser prototype only — import code you trust.
+      <button class="action" id="clearCodeBtn">
+        CLEAR
+      </button>
     </div>
 
-    <div id="importResult"></div>
+    <div class="note">
+      Maximum code size: 50,000 characters per cartridge.
+      Cartridge count is not artificially limited.
+    </div>
 
+    <div class="note warning">
+      Imported JavaScript is API-isolated but not a true
+      browser security sandbox. Only install code you trust.
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>CARTRIDGE LIBRARY</h2>
+
+    <div id="library" class="library"></div>
+
+    <div class="row">
+      <button class="action" id="refreshBtn">
+        REFRESH
+      </button>
+
+      <button class="action" id="defaultsBtn">
+        RESTORE DEFAULTS
+      </button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>SYSTEM</h2>
+
+    <div class="row">
+      <button class="action" id="homeBtn">
+        HOME
+      </button>
+
+      <button class="action" id="powerBtn">
+        POWER CYCLE
+      </button>
+    </div>
+
+    <div class="row">
+      <button class="action" id="wipeBtn">
+        WIPE ALL
+      </button>
+    </div>
+
+    <div class="note danger">
+      Wipe removes all installed cartridges and cartridge data.
+    </div>
   </div>
 
 </div>
-
 
 <script>
 
@@ -242,256 +330,167 @@ button:active{
 class TAPStorage{
 
   constructor(){
-
-    this.data={};
+    this.key="tap_storage_v21";
 
     try{
-
-      const raw=
-        localStorage.getItem("tap_storage");
-
-      if(raw){
-
-        this.data=
-          JSON.parse(raw)||{};
-
-      }
-
-    }catch(error){
-
+      this.data=
+        JSON.parse(
+          localStorage.getItem(this.key) || "{}"
+        ) || {};
+    }catch(e){
       this.data={};
-
     }
-
   }
-
 
   save(){
-
     try{
-
       localStorage.setItem(
-        "tap_storage",
+        this.key,
         JSON.stringify(this.data)
       );
-
-    }catch(error){}
-
+      return true;
+    }catch(e){
+      return false;
+    }
   }
-
 
   get(key){
-
     return this.data[key];
-
   }
-
 
   set(key,value){
-
     this.data[key]=value;
-
-    this.save();
-
+    return this.save();
   }
-
 
   remove(key){
-
     delete this.data[key];
-
-    this.save();
-
+    return this.save();
   }
-
 
   clear(){
-
     this.data={};
-
-    this.save();
-
+    return this.save();
   }
-
 }
 
 
 /* =========================================================
-   TAP HAL
-   Physical hardware abstraction
+   PHYSICAL HARDWARE ABSTRACTION
 ========================================================= */
 
 class TAPHAL{
 
   constructor(){
 
-    this.buttons=[
-      document.querySelector('[data-i="0"]'),
-      document.querySelector('[data-i="1"]'),
-      document.querySelector('[data-i="2"]'),
-      document.querySelector('[data-i="3"]'),
-      document.querySelector('[data-i="4"]')
-    ];
+    this.buttons=
+      Array.from(
+        {length:5},
+        () => ({
+          label:"—",
+          handler:null
+        })
+      );
 
-    this.handlers=[
-      null,
-      null,
-      null,
-      null,
-      null
-    ];
+    this.screenEl=
+      document.getElementById("screen");
 
-    this.labels=[
-      "—",
-      "—",
-      "—",
-      "—",
-      "—"
-    ];
+    this.statusEl=
+      document.getElementById("status");
 
-    this.bindEvents();
+    this.buttonsEl=
+      document.getElementById("buttons");
 
+    this.renderButtons();
   }
 
-
-  bindEvents(){
-
-    this.buttons.forEach(
-      (button,index)=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            const fn=
-              this.handlers[index];
-
-            if(typeof fn==="function"){
-
-              fn();
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-    document.addEventListener(
-      "keydown",
-      event=>{
-
-        const number=
-          parseInt(event.key,10);
-
-        if(
-          number>=1 &&
-          number<=5
-        ){
-
-          this.press(number-1);
-
-        }
-
-      }
-    );
-
+  setDisplay(text){
+    this.screenEl.textContent=
+      String(text ?? "");
   }
 
+  setStatus(text){
+    this.statusEl.textContent=
+      String(text ?? "");
+  }
 
   setButton(index,label,handler){
 
-    if(
-      index<0 ||
-      index>4
-    ){
-
-      return;
-
+    if(index<0 || index>=5){
+      return false;
     }
 
+    this.buttons[index]={
+      label:String(label || "—"),
+      handler:
+        typeof handler==="function"
+          ? handler
+          : null
+    };
 
-    this.labels[index]=
-      label || "—";
+    this.renderButtons();
 
-
-    this.handlers[index]=
-      typeof handler==="function"
-      ? handler
-      : ()=>{};
-
-
-    this.buttons[index].textContent=
-      this.labels[index];
-
+    return true;
   }
-
 
   clearButtons(){
 
-    for(
-      let i=0;
-      i<5;
-      i++
-    ){
+    for(let i=0;i<5;i++){
 
-      this.labels[i]="—";
-
-      this.handlers[i]=null;
-
-      this.buttons[i].textContent=
-        "—";
-
+      this.buttons[i]={
+        label:"—",
+        handler:null
+      };
     }
 
+    this.renderButtons();
   }
-
 
   press(index){
 
-    if(
-      index<0 ||
-      index>4
-    ){
-
+    if(index<0 || index>=5){
       return;
-
     }
 
+    const b=this.buttons[index];
 
-    const fn=
-      this.handlers[index];
-
-    if(typeof fn==="function"){
-
-      fn();
-
+    if(
+      b &&
+      typeof b.handler==="function"
+    ){
+      try{
+        b.handler();
+      }catch(e){
+        console.error(e);
+      }
     }
-
   }
 
+  renderButtons(){
 
-  setDisplay(text){
+    this.buttonsEl.innerHTML="";
 
-    document
-      .getElementById("screen")
-      .textContent=
-        String(text ?? "");
+    this.buttons.forEach((b,i)=>{
 
+      const button=
+        document.createElement("button");
+
+      button.className="physical";
+
+      button.textContent=
+        b.label || "—";
+
+      button.disabled=
+        typeof b.handler!=="function";
+
+      button.addEventListener(
+        "click",
+        ()=>this.press(i)
+      );
+
+      this.buttonsEl.appendChild(button);
+    });
   }
-
-
-  setStatus(text){
-
-    document
-      .getElementById("status")
-      .textContent=
-        String(text ?? "");
-
-  }
-
 }
 
 
@@ -509,505 +508,445 @@ class TAPCore{
     this.hal=
       new TAPHAL();
 
+    /*
+      IMPORTANT:
+      This is an object/dictionary, NOT a
+      five-item array.
+
+      Therefore cartridge count is independent
+      from the five physical buttons.
+    */
+
     this.cartridges={};
 
     this.current=null;
 
-    this.loadRegistry();
+    this.timers=
+      new Set();
 
-    this.home();
-
+    this.boot();
   }
 
 
-  /* =======================================================
-     REGISTRY
-  ======================================================= */
+  /* -------------------------------------------------------
+     BASIC UI
+  ------------------------------------------------------- */
 
-  loadRegistry(){
+  screen(text){
+    this.hal.setDisplay(text);
+  }
 
-    this.cartridges=
-      this.storage.get(
-        "cartridges"
-      ) || {};
-
+  message(text){
+    this.hal.setStatus(text);
   }
 
 
-  saveRegistry(){
-
-    this.storage.set(
-      "cartridges",
-      this.cartridges
-    );
-
-  }
-
-
-  /* =======================================================
-     PHYSICAL INPUT SYSTEM
-     
-     IMPORTANT:
-     Five buttons are physical slots.
-     
-     Cartridges NEVER create new physical buttons.
-     They simply replace the mapping of the five slots.
-  ======================================================= */
-
+  /* -------------------------------------------------------
+     FIVE PHYSICAL BUTTONS
+  ------------------------------------------------------- */
 
   clearButtons(){
-
     this.hal.clearButtons();
-
   }
 
+  bindButton(index,label,callback){
 
-  bindButton(
-    index,
-    label,
-    callback
-  ){
-
-    if(
-      index<0 ||
-      index>4
-    ){
-
-      return false;
-
-    }
-
-
-    this.hal.setButton(
+    return this.hal.setButton(
       index,
       label,
       callback
     );
-
-    return true;
-
   }
-
 
   setButtons(buttons){
 
-    /*
-      Always replace ALL five mappings.
-
-      This is the critical fix.
-    */
-
     this.clearButtons();
 
+    for(let i=0;i<5;i++){
 
-    if(!Array.isArray(buttons)){
+      const item=
+        Array.isArray(buttons)
+          ? buttons[i]
+          : null;
 
-      return;
+      if(!item){
+        continue;
+      }
 
-    }
-
-
-    for(
-      let i=0;
-      i<5;
-      i++
-    ){
-
-      const button=
-        buttons[i];
-
-
-      if(
-        !button
-      ){
+      if(typeof item==="object"){
 
         this.bindButton(
           i,
-          "—",
-          ()=>{}
+          item.label,
+          item.action || item.callback
         );
 
-        continue;
+      }else{
 
+        this.bindButton(
+          i,
+          String(item),
+          null
+        );
       }
-
-
-      this.bindButton(
-        i,
-        button.label || "—",
-        typeof button.action==="function"
-          ? button.action
-          : ()=>{}
-      );
-
     }
-
   }
 
 
-  /* =======================================================
+  /* -------------------------------------------------------
+     TIMER MANAGEMENT
+  ------------------------------------------------------- */
+
+  delay(fn,ms){
+
+    const id=
+      setTimeout(
+        ()=>{
+          this.timers.delete(id);
+
+          try{
+            fn();
+          }catch(e){
+            console.error(e);
+          }
+        },
+        ms
+      );
+
+    this.timers.add(id);
+
+    return id;
+  }
+
+  interval(fn,ms){
+
+    const id=
+      setInterval(
+        ()=>{
+          try{
+            fn();
+          }catch(e){
+            console.error(e);
+          }
+        },
+        ms
+      );
+
+    this.timers.add(id);
+
+    return id;
+  }
+
+  cancel(id){
+
+    clearTimeout(id);
+    clearInterval(id);
+
+    this.timers.delete(id);
+  }
+
+  cancelAllTimers(){
+
+    for(const id of this.timers){
+
+      clearTimeout(id);
+      clearInterval(id);
+    }
+
+    this.timers.clear();
+  }
+
+
+  /* -------------------------------------------------------
      CARTRIDGE CONTEXT
-  ======================================================= */
+  ------------------------------------------------------- */
 
   makeContext(name){
 
     const core=this;
 
+    let buttonIndex=0;
 
-    const dataKey=
-      "cartridge_data_"+name;
+    return {
 
+      onLaunch(fn){
 
-    let cartridgeData=
-      core.storage.get(dataKey)||{};
-
-
-    function saveData(){
-
-      core.storage.set(
-        dataKey,
-        cartridgeData
-      );
-
-    }
-
-
-    const tap={
-
-      version:"2.0",
-
-
-      /* ---------------------------------------------------
-         UI
-      --------------------------------------------------- */
+        this.__launch=fn;
+      },
 
       ui:{
 
         screen(text){
-
-          core.hal.setDisplay(
-            text
-          );
-
+          core.screen(text);
         },
 
-
         status(text){
-
-          core.hal.setStatus(
-            text
-          );
-
+          core.message(text);
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         INPUT
-      --------------------------------------------------- */
 
       input:{
 
         /*
-          Clear all five physical slots.
+          Legacy sequential API.
+
+          Still limited to the five physical buttons,
+          because the hardware has five buttons.
         */
 
         clear(){
 
+          buttonIndex=0;
+
           core.clearButtons();
-
         },
-
-
-        /*
-          Legacy sequential API.
-
-          Each call fills one physical slot.
-          Maximum = five physical slots.
-        */
 
         button(label,callback){
 
-          if(
-            !tap.__buttonIndex
-          ){
-
-            tap.__buttonIndex=0;
-
-          }
-
-
-          const index=
-            tap.__buttonIndex;
-
-
-          if(index>=5){
+          if(buttonIndex>=5){
 
             throw new Error(
               "TAP has 5 physical buttons. "+
-              "Use tap.input.clear() before "+
-              "creating a new mapping."
+              "Use tap.input.clear() or "+
+              "tap.input.set()."
             );
-
           }
 
-
           core.bindButton(
-            index,
+            buttonIndex,
             label,
             callback
           );
 
-
-          tap.__buttonIndex++;
-
+          buttonIndex++;
         },
-
 
         /*
           Recommended API.
 
-          Atomically replaces the entire
-          five-button layout.
+          Atomically replaces the five mappings.
         */
 
         set(buttons){
 
-          core.setButtons(
-            buttons
-          );
+          core.setButtons(buttons);
 
-          /*
-            Reset legacy cursor so that
-            subsequent button() calls begin
-            from the beginning.
-          */
-
-          tap.__buttonIndex=0;
-
+          buttonIndex=0;
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         STORAGE
-      --------------------------------------------------- */
 
       storage:{
 
         get(key){
-
-          return cartridgeData[key];
-
+          return core.getCartData(
+            name,
+            key
+          );
         },
-
 
         set(key,value){
-
-          cartridgeData[key]=value;
-
-          saveData();
-
+          return core.setCartData(
+            name,
+            key,
+            value
+          );
         },
-
 
         remove(key){
-
-          delete cartridgeData[key];
-
-          saveData();
-
+          return core.removeCartData(
+            name,
+            key
+          );
         },
 
-
         clear(){
-
-          cartridgeData={};
-
-          saveData();
-
+          return core.clearCartData(name);
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         NAVIGATION
-      --------------------------------------------------- */
 
       navigation:{
 
         home(){
-
-          core.home();
-
+          core.openHome();
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         SYSTEM
-      --------------------------------------------------- */
 
       system:{
 
         exit(){
-
-          core.home();
-
+          core.openHome();
         },
 
-
         power(){
-
           core.powerCycle();
-
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         TIME
-      --------------------------------------------------- */
 
       time:{
 
         now(){
-
           return Date.now();
-
         },
 
-
-        delay(ms,fn){
-
-          return setTimeout(
-            fn,
-            ms
-          );
-
+        delay(fn,ms){
+          return core.delay(fn,ms);
         },
 
-
-        interval(ms,fn){
-
-          return setInterval(
-            fn,
-            ms
-          );
-
+        interval(fn,ms){
+          return core.interval(fn,ms);
         },
-
 
         cancel(id){
-
-          clearTimeout(id);
-
-          clearInterval(id);
-
+          core.cancel(id);
         }
-
       },
-
-
-      /* ---------------------------------------------------
-         MESSAGE
-      --------------------------------------------------- */
 
       message(text){
-
-        core.hal.setStatus(
-          text
-        );
-
-      },
-
-
-      /* ---------------------------------------------------
-         LAUNCH
-      --------------------------------------------------- */
-
-      onLaunch(fn){
-
-        tap.__launch=fn;
-
+        core.message(text);
       }
-
     };
-
-
-    tap.__buttonIndex=0;
-
-
-    return tap;
-
   }
 
 
-  /* =======================================================
-     VALIDATION
-  ======================================================= */
+  /* -------------------------------------------------------
+     CARTRIDGE DATA
+  ------------------------------------------------------- */
 
-  validate(name,code){
+  getCartData(name,key){
+
+    const all=
+      this.storage.get("cartridgeData") || {};
+
+    const cart=
+      all[name] || {};
+
+    return cart[key];
+  }
+
+  setCartData(name,key,value){
+
+    const all=
+      this.storage.get("cartridgeData") || {};
+
+    if(!all[name]){
+      all[name]={};
+    }
+
+    all[name][key]=value;
+
+    return this.storage.set(
+      "cartridgeData",
+      all
+    );
+  }
+
+  removeCartData(name,key){
+
+    const all=
+      this.storage.get("cartridgeData") || {};
+
+    if(all[name]){
+      delete all[name][key];
+    }
+
+    return this.storage.set(
+      "cartridgeData",
+      all
+    );
+  }
+
+  clearCartData(name){
+
+    const all=
+      this.storage.get("cartridgeData") || {};
+
+    delete all[name];
+
+    return this.storage.set(
+      "cartridgeData",
+      all
+    );
+  }
+
+
+  /* -------------------------------------------------------
+     CARTRIDGE REGISTRY
+  ------------------------------------------------------- */
+
+  saveRegistry(){
+
+    return this.storage.set(
+      "cartridges",
+      this.cartridges
+    );
+  }
+
+  loadRegistry(){
+
+    const saved=
+      this.storage.get("cartridges");
+
+    if(
+      saved &&
+      typeof saved==="object" &&
+      !Array.isArray(saved)
+    ){
+      this.cartridges=saved;
+    }else{
+      this.cartridges={};
+    }
+  }
+
+
+  /* -------------------------------------------------------
+     VALIDATION
+  ------------------------------------------------------- */
+
+  validateName(name){
 
     if(
       typeof name!=="string" ||
-      name.trim().length<1 ||
-      name.trim().length>24
+      name.trim().length<1
     ){
-
       throw new Error(
-        "Cartridge name must be 1–24 characters."
+        "Cartridge name is required."
       );
-
     }
 
-
-    if(
-      typeof code!=="string" ||
-      !code.trim()
-    ){
-
+    if(name.trim().length>24){
       throw new Error(
-        "Cartridge code is empty."
+        "Cartridge name must be 24 characters or less."
       );
-
     }
 
+    return name.trim();
+  }
 
-    if(
-      code.length>50000
-    ){
+  validateCode(code){
 
+    if(typeof code!=="string"){
+      throw new Error(
+        "Cartridge code must be JavaScript text."
+      );
+    }
+
+    if(code.length>50000){
       throw new Error(
         "Cartridge exceeds 50,000 characters."
       );
-
     }
 
-
-    if(
-      !code.includes(
-        "tap.onLaunch"
-      )
-    ){
-
+    if(!code.includes("tap.onLaunch(")){
       throw new Error(
-        "Cartridge must call tap.onLaunch()."
+        "Cartridge must contain tap.onLaunch(...)."
       );
-
     }
-
 
     try{
 
       /*
-        Compile only.
-        Do NOT execute.
+        Compilation check only.
+        The cartridge is NOT executed here.
       */
 
       new Function(
@@ -1015,654 +954,507 @@ class TAPCore{
         code
       );
 
-    }catch(error){
+    }catch(e){
 
       throw new Error(
-        "Syntax error: "+
-        error.message
+        "JavaScript error:\n" +
+        e.message
       );
-
     }
 
+    return true;
   }
 
 
-  /* =======================================================
+  /* -------------------------------------------------------
      INSTALL
-  ======================================================= */
+  ------------------------------------------------------- */
 
   install(name,code){
 
     name=
-      name.trim();
+      this.validateName(name);
 
+    this.validateCode(code);
 
-    this.validate(
-      name,
-      code
-    );
-
+    /*
+      IMPORTANT:
+      No cartridge-count check exists here.
+    */
 
     this.cartridges[name]={
-
       name:name,
-
       code:code,
-
       builtin:false,
-
-      installedAt:
-        Date.now()
-
+      installedAt:Date.now()
     };
 
+    if(!this.saveRegistry()){
 
-    this.saveRegistry();
+      delete this.cartridges[name];
 
+      throw new Error(
+        "Storage limit reached."
+      );
+    }
+
+    refreshLibrary();
+
+    this.message(
+      "Installed: "+name
+    );
+
+    return true;
   }
 
 
-  /* =======================================================
+  /* -------------------------------------------------------
+     DELETE
+  ------------------------------------------------------- */
+
+  remove(name){
+
+    if(!this.cartridges[name]){
+      return false;
+    }
+
+    delete this.cartridges[name];
+
+    this.clearCartData(name);
+
+    this.saveRegistry();
+
+    if(this.current===name){
+      this.current=null;
+    }
+
+    refreshLibrary();
+
+    this.message(
+      "Removed: "+name
+    );
+
+    return true;
+  }
+
+
+  /* -------------------------------------------------------
      LAUNCH
-  ======================================================= */
+  ------------------------------------------------------- */
 
   launch(name){
 
-    const cartridge=
+    const cart=
       this.cartridges[name];
 
+    if(!cart){
 
-    if(!cartridge){
-
-      this.hal.setDisplay(
+      this.screen(
         "CARTRIDGE NOT FOUND\n\n"+
         name
       );
 
       return;
-
     }
 
-
-    /*
-      Kill previous physical mapping.
-    */
-
+    this.cancelAllTimers();
     this.clearButtons();
-
 
     this.current=name;
 
-
-    this.hal.setStatus(
-      "RUNNING: "+name
-    );
-
+    const tap=
+      this.makeContext(name);
 
     try{
-
-      const tap=
-        this.makeContext(
-          name
-        );
-
 
       const program=
         new Function(
           "tap",
-          cartridge.code
+          cart.code
         );
-
-
-      /*
-        Execute cartridge.
-      */
 
       program(tap);
 
-
-      if(
-        typeof tap.__launch!=="function"
-      ){
+      if(typeof tap.__launch!=="function"){
 
         throw new Error(
-          "Cartridge did not register "+
-          "tap.onLaunch()."
+          "Cartridge did not register tap.onLaunch()."
         );
-
       }
 
-
-      /*
-        Execute lifecycle.
-      */
-
-      tap.__launch();
-
-
-    }catch(error){
-
-      this.clearButtons();
-
-
-      this.hal.setDisplay(
-        "CARTRIDGE ERROR\n\n"+
-        name+
-        "\n\n"+
-        error.message
+      this.screen(
+        "LOADING\n\n"+
+        name
       );
 
-
-      this.hal.setStatus(
-        "ERROR"
+      this.delay(
+        ()=>{
+          try{
+            tap.__launch();
+          }catch(e){
+            this.showCartridgeError(
+              name,
+              e
+            );
+          }
+        },
+        80
       );
 
+    }catch(e){
+
+      this.showCartridgeError(
+        name,
+        e
+      );
     }
-
   }
 
 
-  /* =======================================================
-     HOME
-  ======================================================= */
+  showCartridgeError(name,error){
 
-  home(){
+    this.cancelAllTimers();
+    this.clearButtons();
+
+    console.error(
+      "TAP cartridge error:",
+      name,
+      error
+    );
+
+    this.screen(
+      "CARTRIDGE ERROR\n"+
+      "───────────────\n\n"+
+      name+
+      "\n\n"+
+      String(
+        error &&
+        error.message
+          ? error.message
+          : error
+      )+
+      "\n\n"+
+      "[HOME]"
+    );
+
+    this.hal.setButton(
+      0,
+      "HOME",
+      ()=>{
+        this.openHome();
+      }
+    );
+  }
+
+
+  /* -------------------------------------------------------
+     HOME
+  ------------------------------------------------------- */
+
+  openHome(){
+
+    this.cancelAllTimers();
+    this.clearButtons();
 
     this.current=null;
 
-    this.clearButtons();
-
-
-    this.hal.setStatus(
-      "TAP CORE V2"
+    this.screen(
+      "TAP CORE V2.1\n"+
+      "──────────────\n\n"+
+      "CARTRIDGES: "+
+      Object.keys(this.cartridges).length+
+      "\n\n"+
+      "SELECT A CARTRIDGE\n"+
+      "FROM THE LIBRARY."
     );
 
-
-    this.hal.setDisplay(
-      "TAP CORE V2\n"+
-      "────────────\n\n"+
-      "CARTRIDGE COMPUTER\n\n"+
-      "Choose a system."
+    this.message(
+      "5 physical buttons"
     );
-
-
-    this.setButtons([
-
-      {
-        label:"CART",
-        action:()=>this.pick()
-      },
-
-      {
-        label:"SET",
-        action:()=>this.settings()
-      },
-
-      {
-        label:"MANAGER",
-        action:()=>this.manager()
-      },
-
-      {
-        label:"—",
-        action:()=>{}
-      },
-
-      {
-        label:"—",
-        action:()=>{}
-      }
-
-    ]);
-
   }
 
 
-  /* =======================================================
-     CARTRIDGE SELECT
-  ======================================================= */
-
-  pick(){
-
-    const names=
-      Object.keys(
-        this.cartridges
-      );
-
-
-    if(
-      names.length===0
-    ){
-
-      this.hal.setDisplay(
-        "NO CARTRIDGES\n\n"+
-        "Import one below."
-      );
-
-
-      this.setButtons([
-
-        {
-          label:"BACK",
-          action:()=>this.home()
-        },
-
-        null,
-        null,
-        null,
-        null
-
-      ]);
-
-      return;
-
-    }
-
-
-    const shown=
-      names.slice(0,5);
-
-
-    let text=
-      "CARTRIDGES\n"+
-      "────────────\n\n";
-
-
-    shown.forEach(
-      (name,index)=>{
-
-        text+=
-          (index+1)+
-          " "+
-          name+
-          "\n";
-
-      }
-    );
-
-
-    this.hal.setDisplay(
-      text
-    );
-
-
-    this.setButtons(
-
-      shown.map(
-        name=>({
-
-          label:name,
-
-          action:()=>this.launch(name)
-
-        })
-      )
-
-    );
-
-  }
-
-
-  /* =======================================================
-     MANAGER
-  ======================================================= */
-
-  manager(){
-
-    const names=
-      Object.keys(
-        this.cartridges
-      );
-
-
-    let text=
-      "CARTRIDGE MANAGER\n"+
-      "────────────────\n\n";
-
-
-    if(names.length){
-
-      text+=
-        names
-          .map(
-            (n,i)=>
-              (i+1)+" "+n
-          )
-          .join("\n");
-
-    }else{
-
-      text+="NO CARTRIDGES";
-
-    }
-
-
-    this.hal.setDisplay(
-      text
-    );
-
-
-    this.setButtons([
-
-      {
-        label:"IMPORT",
-        action:()=>this.openImport()
-      },
-
-      {
-        label:"LAUNCH",
-        action:()=>this.pick()
-      },
-
-      {
-        label:"HOME",
-        action:()=>this.home()
-      },
-
-      null,
-
-      null
-
-    ]);
-
-  }
-
-
-  /* =======================================================
-     SETTINGS
-  ======================================================= */
-
-  settings(){
-
-    this.hal.setDisplay(
-
-      "SETTINGS\n"+
-      "────────────\n\n"+
-      "TAP CORE V2\n\n"+
-      "5 physical buttons\n"+
-      "Dynamic remapping\n"+
-      "Persistent storage\n"+
-      "50K cartridge limit\n"+
-      "Contextual controls"
-
-    );
-
-
-    this.setButtons([
-
-      {
-        label:"RESTORE",
-        action:()=>this.restoreDefaults()
-      },
-
-      {
-        label:"WIPE",
-        action:()=>this.confirmWipe()
-      },
-
-      {
-        label:"HOME",
-        action:()=>this.home()
-      },
-
-      null,
-
-      null
-
-    ]);
-
-  }
-
-
-  /* =======================================================
+  /* -------------------------------------------------------
      POWER
-  ======================================================= */
+  ------------------------------------------------------- */
 
   powerCycle(){
 
+    this.cancelAllTimers();
     this.clearButtons();
 
     this.current=null;
 
-
-    this.hal.setDisplay(
-      "POWER CYCLE\n\n"+
-      "RESTARTING..."
+    this.screen(
+      "TAP\n\n"+
+      "POWER CYCLING..."
     );
 
-
-    setTimeout(
+    this.delay(
       ()=>{
-        this.home();
+        this.openHome();
       },
-      600
+      500
     );
-
   }
 
 
-  /* =======================================================
-     IMPORT PANEL
-  ======================================================= */
-
-  openImport(){
-
-    document
-      .getElementById(
-        "importPanel"
-      )
-      .classList.remove(
-        "hidden"
-      );
-
-
-    window.scrollTo({
-
-      top:
-        document.body.scrollHeight,
-
-      behavior:"smooth"
-
-    });
-
-  }
-
-
-  /* =======================================================
-     WIPE
-  ======================================================= */
-
-  confirmWipe(){
-
-    this.hal.setDisplay(
-
-      "WIPE ALL DATA?\n\n"+
-      "THIS REMOVES ALL\n"+
-      "CARTRIDGES AND SAVES."
-
-    );
-
-
-    this.setButtons([
-
-      {
-        label:"YES",
-        action:()=>{
-
-          this.storage.clear();
-
-          this.cartridges={};
-
-          this.home();
-
-        }
-      },
-
-      {
-        label:"NO",
-        action:()=>this.settings()
-      },
-
-      null,
-      null,
-      null
-
-    ]);
-
-  }
-
-
-  /* =======================================================
+  /* -------------------------------------------------------
      DEFAULT CARTRIDGE
-  ======================================================= */
+  ------------------------------------------------------- */
 
   restoreDefaults(){
 
-    this.cartridges["TAP TEST"]={
+    const defaults={
 
-      name:"TAP TEST",
-
-      builtin:true,
-
-      code:`
-
+      "TAP TEST":`
 tap.onLaunch(()=>{
+  let count=
+    tap.storage.get("count") || 0;
 
-  let count=0;
-
-  function draw(){
-
+  function draw(message="READY"){
     tap.ui.screen(
-      "TAP TEST\\n"+
-      "────────\\n\\n"+
-      "COUNT: "+count+
-      "\\n\\n"+
-      "Press TEST."
+      "TAP TEST\\\\n"+
+      "────────\\\\n\\\\n"+
+      message+
+      "\\\\n\\\\n"+
+      "COUNT: "+count
     );
-
   }
 
-
   tap.input.set([
-
     {
-      label:"TEST",
+      label:"ADD",
       action:()=>{
-
         count++;
-
-        draw();
-
+        tap.storage.set("count",count);
+        draw("ADDED");
       }
     },
-
+    {
+      label:"SUB",
+      action:()=>{
+        count--;
+        tap.storage.set("count",count);
+        draw("SUBTRACTED");
+      }
+    },
     {
       label:"RESET",
       action:()=>{
-
         count=0;
-
-        draw();
-
+        tap.storage.set("count",count);
+        draw("RESET");
       }
     },
-
+    {
+      label:"MSG",
+      action:()=>{
+        draw("BUTTON 4");
+      }
+    },
     {
       label:"HOME",
       action:()=>{
-
         tap.navigation.home();
-
       }
-    },
-
-    null,
-
-    null
-
+    }
   ]);
 
-
   draw();
-
 });
-
 `
-
     };
 
+    let installed=0;
+
+    for(
+      const [name,code]
+      of Object.entries(defaults)
+    ){
+
+      if(!this.cartridges[name]){
+
+        try{
+
+          this.cartridges[name]={
+            name,
+            code,
+            builtin:true,
+            installedAt:Date.now()
+          };
+
+          installed++;
+
+        }catch(e){
+          console.error(e);
+        }
+      }
+    }
 
     this.saveRegistry();
 
+    refreshLibrary();
 
-    this.hal.setDisplay(
-      "DEFAULT RESTORED\n\n"+
-      "TAP TEST installed."
+    this.message(
+      installed+
+      " default cartridge(s) restored."
     );
-
-
-    this.setButtons([
-
-      {
-        label:"LAUNCH",
-        action:()=>this.launch("TAP TEST")
-      },
-
-      {
-        label:"HOME",
-        action:()=>this.home()
-      },
-
-      null,
-      null,
-      null
-
-    ]);
-
   }
 
+
+  /* -------------------------------------------------------
+     BOOT
+  ------------------------------------------------------- */
+
+  boot(){
+
+    this.loadRegistry();
+
+    if(
+      Object.keys(this.cartridges).length===0
+    ){
+      this.restoreDefaults();
+    }
+
+    this.openHome();
+  }
 }
 
 
 /* =========================================================
-   START TAP
+   UI
 ========================================================= */
 
-const TAP=
+const core=
   new TAPCore();
 
+const libraryEl=
+  document.getElementById("library");
 
-/* =========================================================
-   SYSTEM BUTTONS
-========================================================= */
+const cartNameEl=
+  document.getElementById("cartName");
 
-document
-  .getElementById("homeBtn")
-  .addEventListener(
-    "click",
-    ()=>TAP.home()
-  );
+const cartCodeEl=
+  document.getElementById("cartCode");
 
 
-document
-  .getElementById("powerBtn")
-  .addEventListener(
-    "click",
-    ()=>TAP.powerCycle()
-  );
+function refreshLibrary(){
+
+  const names=
+    Object.keys(core.cartridges)
+      .sort(
+        (a,b)=>
+          a.localeCompare(b)
+      );
+
+  libraryEl.innerHTML="";
+
+  if(names.length===0){
+
+    libraryEl.innerHTML=
+      '<div class="empty">'+
+      'NO CARTRIDGES INSTALLED'+
+      '</div>';
+
+    return;
+  }
+
+  for(const name of names){
+
+    const cart=
+      core.cartridges[name];
+
+    const row=
+      document.createElement("div");
+
+    row.className="cart";
+
+    const title=
+      document.createElement("div");
+
+    title.className="cart-name";
+
+    title.textContent=
+      name+
+      (cart.builtin ? "  • BUILTIN" : "");
+
+    const actions=
+      document.createElement("div");
+
+    actions.className="cart-actions";
+
+    const launch=
+      document.createElement("button");
+
+    launch.className="small";
+
+    launch.textContent="LAUNCH";
+
+    launch.onclick=
+      ()=>{
+        core.launch(name);
+      };
+
+    const edit=
+      document.createElement("button");
+
+    edit.className="small";
+
+    edit.textContent="EDIT";
+
+    edit.onclick=
+      ()=>{
+
+        cartNameEl.value=
+          cart.name;
+
+        cartCodeEl.value=
+          cart.code;
+
+        window.scrollTo({
+          top:document.body.scrollHeight,
+          behavior:"smooth"
+        });
+      };
+
+    const remove=
+      document.createElement("button");
+
+    remove.className="small";
+
+    remove.textContent="DELETE";
+
+    remove.onclick=
+      ()=>{
+
+        const ok=
+          confirm(
+            'Delete cartridge "'+
+            name+
+            '"?'
+          );
+
+        if(ok){
+          core.remove(name);
+        }
+      };
+
+    actions.appendChild(launch);
+    actions.appendChild(edit);
+    actions.appendChild(remove);
+
+    row.appendChild(title);
+    row.appendChild(actions);
+
+    libraryEl.appendChild(row);
+  }
+}
 
 
 /* =========================================================
    IMPORT UI
 ========================================================= */
-
-document
-  .getElementById("openImport")
-  .addEventListener(
-    "click",
-    ()=>TAP.openImport()
-  );
-
 
 document
   .getElementById("installBtn")
@@ -1671,93 +1463,175 @@ document
     ()=>{
 
       const name=
-        document
-          .getElementById(
-            "cartName"
-          )
-          .value;
-
+        cartNameEl.value.trim();
 
       const code=
-        document
-          .getElementById(
-            "cartCode"
-          )
-          .value;
-
-
-      const result=
-        document
-          .getElementById(
-            "importResult"
-          );
-
+        cartCodeEl.value;
 
       try{
 
-        TAP.install(
+        core.install(
           name,
           code
         );
 
+        cartNameEl.value="";
+        cartCodeEl.value="";
 
-        result.className="ok";
-
-
-        result.textContent=
-          "IMPORT ✓\n"+
-          "VALIDATE ✓\n"+
-          "INSTALL ✓\n\n"+
+        core.screen(
+          "CARTRIDGE INSTALLED\n\n"+
           name+
-          " is ready.\n"+
-          "Nothing has executed yet.";
+          "\n\n"+
+          "Nothing has executed yet.\n"+
+          "Launch it from the library."
+        );
 
+        core.clearButtons();
 
-        document
-          .getElementById(
-            "cartName"
+      }catch(e){
+
+        core.screen(
+          "IMPORT ERROR\n\n"+
+          String(
+            e.message || e
           )
-          .value="";
-
-
-        document
-          .getElementById(
-            "cartCode"
-          )
-          .value="";
-
-
-      }catch(error){
-
-        result.className="err";
-
-
-        result.textContent=
-          "IMPORT ✗\n\n"+
-          error.message;
-
+        );
       }
+    }
+  );
 
-    });
+
+document
+  .getElementById("clearCodeBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      cartNameEl.value="";
+      cartCodeEl.value="";
+    }
+  );
 
 
 /* =========================================================
-   DEFAULT BOOT
+   SYSTEM BUTTONS
 ========================================================= */
 
-if(
-  Object.keys(
-    TAP.cartridges
-  ).length===0
-){
+document
+  .getElementById("refreshBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      core.loadRegistry();
+      refreshLibrary();
 
-  TAP.restoreDefaults();
+      core.message(
+        Object.keys(core.cartridges).length+
+        " cartridges installed."
+      );
+    }
+  );
 
-}else{
 
-  TAP.home();
+document
+  .getElementById("defaultsBtn")
+  .addEventListener(
+    "click",
+    ()=>{
 
-}
+      core.restoreDefaults();
+
+      core.openHome();
+    }
+  );
+
+
+document
+  .getElementById("homeBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      core.openHome();
+    }
+  );
+
+
+document
+  .getElementById("powerBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      core.powerCycle();
+    }
+  );
+
+
+document
+  .getElementById("wipeBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      const ok=
+        confirm(
+          "WIPE ALL TAP DATA?\n\n"+
+          "This removes every cartridge."
+        );
+
+      if(!ok) return;
+
+      core.cancelAllTimers();
+      core.clearButtons();
+
+      core.storage.clear();
+
+      core.cartridges={};
+      core.current=null;
+
+      refreshLibrary();
+
+      core.screen(
+        "TAP WIPED\n\n"+
+        "NO CARTRIDGES\n\n"+
+        "RESTORING CORE..."
+      );
+
+      setTimeout(
+        ()=>{
+          core.restoreDefaults();
+          core.openHome();
+        },
+        500
+      );
+    }
+  );
+
+
+/* =========================================================
+   KEYBOARD INPUT
+========================================================= */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    const n=
+      Number(e.key);
+
+    if(
+      n>=1 &&
+      n<=5
+    ){
+      core.hal.press(n-1);
+    }
+  }
+);
+
+
+/* =========================================================
+   INITIAL LIBRARY
+========================================================= */
+
+refreshLibrary();
 
 </script>
 
