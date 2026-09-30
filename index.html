@@ -1,0 +1,1413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TAP Core V2</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:#111;
+  color:#eee;
+  font-family:monospace;
+}
+
+body{
+  display:flex;
+  justify-content:center;
+  padding:18px;
+}
+
+#app{
+  width:min(430px,100%);
+}
+
+h1{
+  text-align:center;
+  margin:0 0 12px;
+  font-size:20px;
+  letter-spacing:3px;
+}
+
+.device{
+  background:#202020;
+  border:2px solid #444;
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 15px 45px #000;
+}
+
+.screen{
+  min-height:250px;
+  background:#cfd7c3;
+  color:#172016;
+  border:8px solid #111;
+  border-radius:10px;
+  padding:18px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:15px;
+  line-height:1.35;
+  box-shadow:inset 0 0 20px #0004;
+}
+
+.status{
+  text-align:center;
+  font-size:11px;
+  margin:8px 0;
+  color:#aaa;
+  min-height:15px;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+
+button{
+  min-height:58px;
+  border:2px solid #555;
+  border-radius:50%;
+  background:#333;
+  color:#fff;
+  font-family:monospace;
+  font-size:10px;
+  font-weight:bold;
+  padding:4px;
+  overflow:hidden;
+}
+
+button:active{
+  transform:scale(.94);
+  background:#555;
+}
+
+.system{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:15px;
+}
+
+.system button{
+  min-height:42px;
+  border-radius:8px;
+  font-size:11px;
+}
+
+.panel{
+  background:#181818;
+  border:1px solid #333;
+  border-radius:12px;
+  padding:12px;
+  margin-top:12px;
+}
+
+.panel input,
+.panel textarea{
+  width:100%;
+  background:#090909;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:7px;
+  padding:10px;
+  font-family:monospace;
+  margin-bottom:8px;
+}
+
+.panel textarea{
+  min-height:140px;
+  resize:vertical;
+}
+
+.panel button{
+  width:100%;
+  min-height:42px;
+  border-radius:7px;
+  margin-top:5px;
+}
+
+.hidden{
+  display:none;
+}
+
+.small{
+  font-size:11px;
+  color:#999;
+  line-height:1.4;
+}
+
+.ok{
+  color:#9f9;
+}
+
+.err{
+  color:#f88;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<h1>TAP CORE V2</h1>
+
+<div class="device">
+
+  <div id="screen" class="screen">BOOTING TAP...</div>
+
+  <div id="status" class="status"></div>
+
+  <div id="buttons" class="buttons">
+    <button data-i="0">—</button>
+    <button data-i="1">—</button>
+    <button data-i="2">—</button>
+    <button data-i="3">—</button>
+    <button data-i="4">—</button>
+  </div>
+
+  <div class="system">
+    <button id="homeBtn">HOME</button>
+    <button id="powerBtn">POWER</button>
+  </div>
+
+</div>
+
+<div class="panel">
+
+  <button id="openImport">IMPORT CARTRIDGE</button>
+
+  <div id="importPanel" class="hidden">
+
+    <input
+      id="cartName"
+      maxlength="24"
+      placeholder="Cartridge name">
+
+    <textarea
+      id="cartCode"
+      placeholder="Paste cartridge JavaScript here"></textarea>
+
+    <button id="installBtn">VALIDATE + INSTALL</button>
+
+    <div class="small">
+      Cartridge JavaScript runs through the TAP cartridge API.
+      Only import code you trust in this browser prototype.
+    </div>
+
+    <div id="importResult"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   TAP STORAGE
+========================================================= */
+
+class TAPStorage{
+
+  constructor(){
+
+    this.data={};
+
+    try{
+
+      const raw=localStorage.getItem("tap_storage");
+
+      if(raw){
+        this.data=JSON.parse(raw)||{};
+      }
+
+    }catch(e){
+
+      this.data={};
+
+    }
+
+  }
+
+  save(){
+
+    try{
+
+      localStorage.setItem(
+        "tap_storage",
+        JSON.stringify(this.data)
+      );
+
+    }catch(e){}
+
+  }
+
+  get(key){
+
+    return this.data[key];
+
+  }
+
+  set(key,value){
+
+    this.data[key]=value;
+    this.save();
+
+  }
+
+  remove(key){
+
+    delete this.data[key];
+    this.save();
+
+  }
+
+  clear(){
+
+    this.data={};
+    this.save();
+
+  }
+
+}
+
+
+/* =========================================================
+   TAP HAL
+   Physical hardware abstraction layer
+========================================================= */
+
+class TAPHAL{
+
+  constructor(){
+
+    this.buttons=[
+      document.querySelector('[data-i="0"]'),
+      document.querySelector('[data-i="1"]'),
+      document.querySelector('[data-i="2"]'),
+      document.querySelector('[data-i="3"]'),
+      document.querySelector('[data-i="4"]')
+    ];
+
+    this.handlers=[
+      null,null,null,null,null
+    ];
+
+    this.labels=[
+      "—","—","—","—","—"
+    ];
+
+    this.bindPhysicalEvents();
+
+  }
+
+
+  bindPhysicalEvents(){
+
+    this.buttons.forEach((button,index)=>{
+
+      button.addEventListener("click",()=>{
+
+        const fn=this.handlers[index];
+
+        if(typeof fn==="function"){
+
+          fn();
+
+        }
+
+      });
+
+    });
+
+
+    document.addEventListener("keydown",(event)=>{
+
+      const n=parseInt(event.key,10);
+
+      if(n>=1 && n<=5){
+
+        this.press(n-1);
+
+      }
+
+    });
+
+  }
+
+
+  setButton(index,label,handler){
+
+    if(index<0 || index>4) return;
+
+    this.labels[index]=label || "—";
+    this.handlers[index]=
+      typeof handler==="function"
+      ? handler
+      : ()=>{};
+
+    this.buttons[index].textContent=
+      this.labels[index];
+
+  }
+
+
+  clearButtons(){
+
+    for(let i=0;i<5;i++){
+
+      this.labels[i]="—";
+      this.handlers[i]=null;
+      this.buttons[i].textContent="—";
+
+    }
+
+  }
+
+
+  press(index){
+
+    if(index<0 || index>4) return;
+
+    const fn=this.handlers[index];
+
+    if(typeof fn==="function"){
+
+      fn();
+
+    }
+
+  }
+
+
+  setDisplay(text){
+
+    document.getElementById("screen").textContent=
+      String(text ?? "");
+
+  }
+
+
+  setStatus(text){
+
+    document.getElementById("status").textContent=
+      String(text ?? "");
+
+  }
+
+}
+
+
+/* =========================================================
+   TAP CORE
+========================================================= */
+
+class TAPCore{
+
+  constructor(){
+
+    this.storage=new TAPStorage();
+
+    this.hal=new TAPHAL();
+
+    this.cartridges={};
+
+    this.current=null;
+
+    this.currentButtons=0;
+
+    this.boot();
+
+  }
+
+
+  boot(){
+
+    this.loadRegistry();
+
+    this.home();
+
+  }
+
+
+  loadRegistry(){
+
+    const registry=
+      this.storage.get("cartridges") || {};
+
+    this.cartridges=registry;
+
+  }
+
+
+  saveRegistry(){
+
+    this.storage.set(
+      "cartridges",
+      this.cartridges
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     INPUT
+  ------------------------------------------------------- */
+
+  clearButtons(){
+
+    this.hal.clearButtons();
+
+    this.currentButtons=0;
+
+  }
+
+
+  bindButton(label,callback){
+
+    if(this.currentButtons>=5){
+
+      throw new Error(
+        "TAP input limit exceeded: maximum 5 buttons."
+      );
+
+    }
+
+    const index=this.currentButtons++;
+
+    this.hal.setButton(
+      index,
+      label,
+      callback
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     CARTRIDGE CONTEXT
+  ------------------------------------------------------- */
+
+  makeContext(name){
+
+    const core=this;
+
+    const cartridgeStoreKey=
+      "cartridge_data_"+name;
+
+    let cartridgeData=
+      core.storage.get(cartridgeStoreKey)||{};
+
+
+    function saveData(){
+
+      core.storage.set(
+        cartridgeStoreKey,
+        cartridgeData
+      );
+
+    }
+
+
+    const tap={
+
+      version:"2.0",
+
+      ui:{
+
+        screen(text){
+
+          core.hal.setDisplay(text);
+
+        },
+
+        status(text){
+
+          core.hal.setStatus(text);
+
+        }
+
+      },
+
+
+      input:{
+
+        /*
+          THIS IS THE IMPORTANT FIX.
+
+          Cartridges can now completely remap
+          the five physical buttons.
+        */
+
+        clear(){
+
+          core.clearButtons();
+
+        },
+
+
+        button(label,callback){
+
+          core.bindButton(
+            label,
+            callback
+          );
+
+        }
+
+      },
+
+
+      storage:{
+
+        get(key){
+
+          return cartridgeData[key];
+
+        },
+
+
+        set(key,value){
+
+          cartridgeData[key]=value;
+          saveData();
+
+        },
+
+
+        remove(key){
+
+          delete cartridgeData[key];
+          saveData();
+
+        },
+
+
+        clear(){
+
+          cartridgeData={};
+          saveData();
+
+        }
+
+      },
+
+
+      navigation:{
+
+        home(){
+
+          core.home();
+
+        }
+
+      },
+
+
+      system:{
+
+        exit(){
+
+          core.home();
+
+        },
+
+
+        power(){
+
+          core.powerCycle();
+
+        }
+
+      },
+
+
+      time:{
+
+        now(){
+
+          return Date.now();
+
+        },
+
+
+        delay(ms,fn){
+
+          return setTimeout(
+            fn,
+            ms
+          );
+
+        },
+
+
+        interval(ms,fn){
+
+          return setInterval(
+            fn,
+            ms
+          );
+
+        },
+
+
+        cancel(id){
+
+          clearTimeout(id);
+          clearInterval(id);
+
+        }
+
+      },
+
+
+      message(text){
+
+        core.hal.setStatus(text);
+
+      },
+
+
+      onLaunch(fn){
+
+        tap.__launch=fn;
+
+      }
+
+    };
+
+
+    return tap;
+
+  }
+
+
+  /* -------------------------------------------------------
+     VALIDATION
+  ------------------------------------------------------- */
+
+  validate(name,code){
+
+    if(
+      typeof name!=="string" ||
+      name.trim().length<1 ||
+      name.trim().length>24
+    ){
+
+      throw new Error(
+        "Cartridge name must be 1–24 characters."
+      );
+
+    }
+
+
+    if(
+      typeof code!=="string" ||
+      code.trim().length<1
+    ){
+
+      throw new Error(
+        "Cartridge code is empty."
+      );
+
+    }
+
+
+    if(code.length>50000){
+
+      throw new Error(
+        "Cartridge exceeds 50,000 character limit."
+      );
+
+    }
+
+
+    if(!code.includes("tap.onLaunch")){
+
+      throw new Error(
+        "Cartridge must call tap.onLaunch()."
+      );
+
+    }
+
+
+    try{
+
+      /*
+        Compilation test only.
+        The cartridge is NOT executed here.
+      */
+
+      new Function(
+        "tap",
+        code
+      );
+
+    }catch(error){
+
+      throw new Error(
+        "Syntax error: "+error.message
+      );
+
+    }
+
+  }
+
+
+  /* -------------------------------------------------------
+     INSTALL
+  ------------------------------------------------------- */
+
+  install(name,code){
+
+    name=name.trim();
+
+    this.validate(
+      name,
+      code
+    );
+
+
+    this.cartridges[name]={
+
+      name:name,
+
+      code:code,
+
+      builtin:false,
+
+      installedAt:Date.now()
+
+    };
+
+
+    this.saveRegistry();
+
+    return true;
+
+  }
+
+
+  /* -------------------------------------------------------
+     LAUNCH
+  ------------------------------------------------------- */
+
+  launch(name){
+
+    const cartridge=
+      this.cartridges[name];
+
+    if(!cartridge){
+
+      this.hal.setDisplay(
+        "CARTRIDGE NOT FOUND\n\n"+name
+      );
+
+      return;
+
+    }
+
+
+    this.clearButtons();
+
+    this.current=name;
+
+    this.hal.setStatus(
+      "RUNNING: "+name
+    );
+
+
+    const tap=
+      this.makeContext(name);
+
+
+    try{
+
+      /*
+        Cartridge execution happens here.
+      */
+
+      const fn=
+        new Function(
+          "tap",
+          cartridge.code
+        );
+
+
+      fn(tap);
+
+
+      if(typeof tap.__launch!=="function"){
+
+        throw new Error(
+          "Cartridge did not register onLaunch()."
+        );
+
+      }
+
+
+      tap.__launch();
+
+
+    }catch(error){
+
+      this.clearButtons();
+
+      this.hal.setDisplay(
+        "CARTRIDGE ERROR\n\n"+
+        name+
+        "\n\n"+
+        error.message
+      );
+
+      this.hal.setStatus(
+        "ERROR"
+      );
+
+    }
+
+  }
+
+
+  /* -------------------------------------------------------
+     HOME
+  ------------------------------------------------------- */
+
+  home(){
+
+    this.current=null;
+
+    this.clearButtons();
+
+    this.hal.setStatus(
+      "TAP CORE V2"
+    );
+
+
+    this.hal.setDisplay(
+      "TAP CORE V2\n"+
+      "────────────\n\n"+
+      "CARTRIDGE COMPUTER\n\n"+
+      "1 CARTRIDGES\n"+
+      "2 SETTINGS\n"+
+      "3 MANAGER\n\n"+
+      "Choose a system function."
+    );
+
+
+    this.bindButton(
+      "CART",
+      ()=>this.pick()
+    );
+
+
+    this.bindButton(
+      "SET",
+      ()=>this.settings()
+    );
+
+
+    this.bindButton(
+      "MANAGER",
+      ()=>this.manager()
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     CARTRIDGE PICKER
+  ------------------------------------------------------- */
+
+  pick(){
+
+    this.clearButtons();
+
+    const names=
+      Object.keys(this.cartridges);
+
+
+    if(names.length===0){
+
+      this.hal.setDisplay(
+        "NO CARTRIDGES\n\n"+
+        "Import one below."
+      );
+
+      this.bindButton(
+        "BACK",
+        ()=>this.home()
+      );
+
+      return;
+
+    }
+
+
+    let text=
+      "CARTRIDGES\n"+
+      "────────────\n\n";
+
+
+    names.slice(0,5).forEach(
+      (name,index)=>{
+
+        text+=
+          (index+1)+
+          " "+
+          name+
+          "\n";
+
+      }
+    );
+
+
+    this.hal.setDisplay(text);
+
+
+    names.slice(0,5).forEach(
+      (name)=>{
+
+        this.bindButton(
+          name,
+          ()=>this.launch(name)
+        );
+
+      }
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     MANAGER
+  ------------------------------------------------------- */
+
+  manager(){
+
+    this.clearButtons();
+
+    this.hal.setDisplay(
+      "CARTRIDGE MANAGER\n"+
+      "────────────\n\n"+
+      Object.keys(this.cartridges)
+        .map(
+          (n,i)=>
+            (i+1)+" "+n
+        )
+        .join("\n")+
+      "\n\nUse IMPORT below."
+    );
+
+
+    this.bindButton(
+      "IMPORT",
+      ()=>this.openImport()
+    );
+
+
+    this.bindButton(
+      "LAUNCH",
+      ()=>this.pick()
+    );
+
+
+    this.bindButton(
+      "HOME",
+      ()=>this.home()
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     SETTINGS
+  ------------------------------------------------------- */
+
+  settings(){
+
+    this.clearButtons();
+
+    this.hal.setDisplay(
+      "SETTINGS\n"+
+      "────────────\n\n"+
+      "TAP CORE V2\n"+
+      "5 physical inputs\n"+
+      "Dynamic button mapping\n"+
+      "Persistent storage\n"+
+      "50K cartridge limit"
+    );
+
+
+    this.bindButton(
+      "RESTORE",
+      ()=>this.restoreDefaults()
+    );
+
+
+    this.bindButton(
+      "WIPE",
+      ()=>this.confirmWipe()
+    );
+
+
+    this.bindButton(
+      "HOME",
+      ()=>this.home()
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     POWER
+  ------------------------------------------------------- */
+
+  powerCycle(){
+
+    this.clearButtons();
+
+    this.current=null;
+
+    this.hal.setDisplay(
+      "POWER CYCLE\n\n"+
+      "TAP CORE\n"+
+      "RESTARTING..."
+    );
+
+
+    setTimeout(
+      ()=>this.home(),
+      600
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     IMPORT UI
+  ------------------------------------------------------- */
+
+  openImport(){
+
+    document
+      .getElementById("importPanel")
+      .classList.remove("hidden");
+
+    window.scrollTo({
+      top:document.body.scrollHeight,
+      behavior:"smooth"
+    });
+
+  }
+
+
+  /* -------------------------------------------------------
+     WIPE
+  ------------------------------------------------------- */
+
+  confirmWipe(){
+
+    this.clearButtons();
+
+    this.hal.setDisplay(
+      "WIPE ALL DATA?\n\n"+
+      "THIS REMOVES\n"+
+      "ALL CARTRIDGES\n"+
+      "AND SAVES."
+    );
+
+
+    this.bindButton(
+      "YES",
+      ()=>{
+
+        this.storage.clear();
+
+        this.cartridges={};
+
+        this.home();
+
+      }
+    );
+
+
+    this.bindButton(
+      "NO",
+      ()=>this.settings()
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+
+    this.bindButton(
+      "—",
+      ()=>{}
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     DEFAULT CARTRIDGE
+  ------------------------------------------------------- */
+
+  restoreDefaults(){
+
+    this.cartridges["TAP TEST"]={
+
+      name:"TAP TEST",
+
+      builtin:true,
+
+      code:`
+tap.onLaunch(()=>{
+
+  let count=0;
+
+  function show(){
+
+    tap.ui.screen(
+      "TAP TEST\\n\\n"+
+      "PRESS TEST\\n\\n"+
+      "COUNT: "+count
+    );
+
+  }
+
+  tap.input.clear();
+
+  tap.input.button(
+    "TEST",
+    ()=>{
+      count++;
+      show();
+    }
+  );
+
+  tap.input.button(
+    "RESET",
+    ()=>{
+      count=0;
+      show();
+    }
+  );
+
+  tap.input.button(
+    "HOME",
+    ()=>{
+      tap.navigation.home();
+    }
+  );
+
+  tap.input.button("—",()=>{});
+  tap.input.button("—",()=>{});
+
+  show();
+
+});
+`
+
+    };
+
+
+    this.saveRegistry();
+
+    this.hal.setDisplay(
+      "DEFAULT RESTORED\n\n"+
+      "TAP TEST installed."
+    );
+
+    this.bindButton(
+      "LAUNCH",
+      ()=>this.launch("TAP TEST")
+    );
+
+    this.bindButton(
+      "HOME",
+      ()=>this.home()
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CREATE CORE
+========================================================= */
+
+const TAP=new TAPCore();
+
+
+/* =========================================================
+   SYSTEM BUTTONS
+========================================================= */
+
+document
+  .getElementById("homeBtn")
+  .addEventListener(
+    "click",
+    ()=>TAP.home()
+  );
+
+
+document
+  .getElementById("powerBtn")
+  .addEventListener(
+    "click",
+    ()=>TAP.powerCycle()
+  );
+
+
+/* =========================================================
+   IMPORT UI
+========================================================= */
+
+document
+  .getElementById("openImport")
+  .addEventListener(
+    "click",
+    ()=>TAP.openImport()
+  );
+
+
+document
+  .getElementById("installBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      const name=
+        document
+          .getElementById("cartName")
+          .value;
+
+      const code=
+        document
+          .getElementById("cartCode")
+          .value;
+
+      const result=
+        document
+          .getElementById("importResult");
+
+
+      try{
+
+        TAP.install(
+          name,
+          code
+        );
+
+
+        result.className="ok";
+
+        result.textContent=
+          "IMPORT ✓\n"+
+          "VALIDATE ✓\n"+
+          "INSTALL ✓\n\n"+
+          name+
+          " is ready.\n"+
+          "Nothing has executed yet.";
+
+
+        document
+          .getElementById("cartName")
+          .value="";
+
+        document
+          .getElementById("cartCode")
+          .value="";
+
+
+      }catch(error){
+
+        result.className="err";
+
+        result.textContent=
+          "IMPORT ✗\n\n"+
+          error.message;
+
+      }
+
+    });
+
+
+/* =========================================================
+   AUTO-LOAD A BASIC TEST IF NONE EXIST
+========================================================= */
+
+if(
+  Object.keys(TAP.cartridges).length===0
+){
+
+  TAP.restoreDefaults();
+
+}else{
+
+  TAP.home();
+
+}
+
+</script>
+
+</body>
+</html>
