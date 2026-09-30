@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport"
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 <title>TAP Core V2</title>
 
 <style>
@@ -23,7 +24,7 @@ html,body{
 body{
   display:flex;
   justify-content:center;
-  padding:18px;
+  padding:16px;
 }
 
 #app{
@@ -32,7 +33,7 @@ body{
 
 h1{
   text-align:center;
-  margin:0 0 12px;
+  margin:4px 0 12px;
   font-size:20px;
   letter-spacing:3px;
 }
@@ -61,17 +62,17 @@ h1{
 
 .status{
   text-align:center;
-  font-size:11px;
+  min-height:16px;
   margin:8px 0;
+  font-size:11px;
   color:#aaa;
-  min-height:15px;
 }
 
 .buttons{
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:8px;
-  margin-top:15px;
+  margin-top:14px;
 }
 
 button{
@@ -81,9 +82,9 @@ button{
   background:#333;
   color:#fff;
   font-family:monospace;
-  font-size:10px;
+  font-size:9px;
   font-weight:bold;
-  padding:4px;
+  padding:3px;
   overflow:hidden;
 }
 
@@ -96,7 +97,7 @@ button:active{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-top:15px;
+  margin-top:14px;
 }
 
 .system button{
@@ -126,7 +127,7 @@ button:active{
 }
 
 .panel textarea{
-  min-height:140px;
+  min-height:150px;
   resize:vertical;
 }
 
@@ -142,17 +143,20 @@ button:active{
 }
 
 .small{
-  font-size:11px;
+  font-size:10px;
   color:#999;
   line-height:1.4;
+  margin-top:8px;
 }
 
 .ok{
   color:#9f9;
+  white-space:pre-wrap;
 }
 
 .err{
   color:#f88;
+  white-space:pre-wrap;
 }
 </style>
 </head>
@@ -165,28 +169,42 @@ button:active{
 
 <div class="device">
 
-  <div id="screen" class="screen">BOOTING TAP...</div>
+  <div id="screen" class="screen">
+    BOOTING TAP...
+  </div>
 
   <div id="status" class="status"></div>
 
   <div id="buttons" class="buttons">
+
     <button data-i="0">—</button>
     <button data-i="1">—</button>
     <button data-i="2">—</button>
     <button data-i="3">—</button>
     <button data-i="4">—</button>
+
   </div>
 
   <div class="system">
-    <button id="homeBtn">HOME</button>
-    <button id="powerBtn">POWER</button>
+
+    <button id="homeBtn">
+      HOME
+    </button>
+
+    <button id="powerBtn">
+      POWER
+    </button>
+
   </div>
 
 </div>
 
+
 <div class="panel">
 
-  <button id="openImport">IMPORT CARTRIDGE</button>
+  <button id="openImport">
+    IMPORT CARTRIDGE
+  </button>
 
   <div id="importPanel" class="hidden">
 
@@ -199,11 +217,13 @@ button:active{
       id="cartCode"
       placeholder="Paste cartridge JavaScript here"></textarea>
 
-    <button id="installBtn">VALIDATE + INSTALL</button>
+    <button id="installBtn">
+      VALIDATE + INSTALL
+    </button>
 
     <div class="small">
-      Cartridge JavaScript runs through the TAP cartridge API.
-      Only import code you trust in this browser prototype.
+      Cartridge code executes through the TAP API.
+      Browser prototype only — import code you trust.
     </div>
 
     <div id="importResult"></div>
@@ -211,6 +231,7 @@ button:active{
   </div>
 
 </div>
+
 
 <script>
 
@@ -226,19 +247,24 @@ class TAPStorage{
 
     try{
 
-      const raw=localStorage.getItem("tap_storage");
+      const raw=
+        localStorage.getItem("tap_storage");
 
       if(raw){
-        this.data=JSON.parse(raw)||{};
+
+        this.data=
+          JSON.parse(raw)||{};
+
       }
 
-    }catch(e){
+    }catch(error){
 
       this.data={};
 
     }
 
   }
+
 
   save(){
 
@@ -249,9 +275,10 @@ class TAPStorage{
         JSON.stringify(this.data)
       );
 
-    }catch(e){}
+    }catch(error){}
 
   }
+
 
   get(key){
 
@@ -259,23 +286,29 @@ class TAPStorage{
 
   }
 
+
   set(key,value){
 
     this.data[key]=value;
+
     this.save();
 
   }
+
 
   remove(key){
 
     delete this.data[key];
+
     this.save();
 
   }
 
+
   clear(){
 
     this.data={};
+
     this.save();
 
   }
@@ -285,7 +318,7 @@ class TAPStorage{
 
 /* =========================================================
    TAP HAL
-   Physical hardware abstraction layer
+   Physical hardware abstraction
 ========================================================= */
 
 class TAPHAL{
@@ -301,61 +334,94 @@ class TAPHAL{
     ];
 
     this.handlers=[
-      null,null,null,null,null
+      null,
+      null,
+      null,
+      null,
+      null
     ];
 
     this.labels=[
-      "—","—","—","—","—"
+      "—",
+      "—",
+      "—",
+      "—",
+      "—"
     ];
 
-    this.bindPhysicalEvents();
+    this.bindEvents();
 
   }
 
 
-  bindPhysicalEvents(){
+  bindEvents(){
 
-    this.buttons.forEach((button,index)=>{
+    this.buttons.forEach(
+      (button,index)=>{
 
-      button.addEventListener("click",()=>{
+        button.addEventListener(
+          "click",
+          ()=>{
 
-        const fn=this.handlers[index];
+            const fn=
+              this.handlers[index];
 
-        if(typeof fn==="function"){
+            if(typeof fn==="function"){
 
-          fn();
+              fn();
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      event=>{
+
+        const number=
+          parseInt(event.key,10);
+
+        if(
+          number>=1 &&
+          number<=5
+        ){
+
+          this.press(number-1);
 
         }
 
-      });
-
-    });
-
-
-    document.addEventListener("keydown",(event)=>{
-
-      const n=parseInt(event.key,10);
-
-      if(n>=1 && n<=5){
-
-        this.press(n-1);
-
       }
-
-    });
+    );
 
   }
 
 
   setButton(index,label,handler){
 
-    if(index<0 || index>4) return;
+    if(
+      index<0 ||
+      index>4
+    ){
 
-    this.labels[index]=label || "—";
+      return;
+
+    }
+
+
+    this.labels[index]=
+      label || "—";
+
+
     this.handlers[index]=
       typeof handler==="function"
       ? handler
       : ()=>{};
+
 
     this.buttons[index].textContent=
       this.labels[index];
@@ -365,11 +431,18 @@ class TAPHAL{
 
   clearButtons(){
 
-    for(let i=0;i<5;i++){
+    for(
+      let i=0;
+      i<5;
+      i++
+    ){
 
       this.labels[i]="—";
+
       this.handlers[i]=null;
-      this.buttons[i].textContent="—";
+
+      this.buttons[i].textContent=
+        "—";
 
     }
 
@@ -378,9 +451,18 @@ class TAPHAL{
 
   press(index){
 
-    if(index<0 || index>4) return;
+    if(
+      index<0 ||
+      index>4
+    ){
 
-    const fn=this.handlers[index];
+      return;
+
+    }
+
+
+    const fn=
+      this.handlers[index];
 
     if(typeof fn==="function"){
 
@@ -393,16 +475,20 @@ class TAPHAL{
 
   setDisplay(text){
 
-    document.getElementById("screen").textContent=
-      String(text ?? "");
+    document
+      .getElementById("screen")
+      .textContent=
+        String(text ?? "");
 
   }
 
 
   setStatus(text){
 
-    document.getElementById("status").textContent=
-      String(text ?? "");
+    document
+      .getElementById("status")
+      .textContent=
+        String(text ?? "");
 
   }
 
@@ -417,22 +503,15 @@ class TAPCore{
 
   constructor(){
 
-    this.storage=new TAPStorage();
+    this.storage=
+      new TAPStorage();
 
-    this.hal=new TAPHAL();
+    this.hal=
+      new TAPHAL();
 
     this.cartridges={};
 
     this.current=null;
-
-    this.currentButtons=0;
-
-    this.boot();
-
-  }
-
-
-  boot(){
 
     this.loadRegistry();
 
@@ -441,12 +520,16 @@ class TAPCore{
   }
 
 
+  /* =======================================================
+     REGISTRY
+  ======================================================= */
+
   loadRegistry(){
 
-    const registry=
-      this.storage.get("cartridges") || {};
-
-    this.cartridges=registry;
+    this.cartridges=
+      this.storage.get(
+        "cartridges"
+      ) || {};
 
   }
 
@@ -461,30 +544,39 @@ class TAPCore{
   }
 
 
-  /* -------------------------------------------------------
-     INPUT
-  ------------------------------------------------------- */
+  /* =======================================================
+     PHYSICAL INPUT SYSTEM
+     
+     IMPORTANT:
+     Five buttons are physical slots.
+     
+     Cartridges NEVER create new physical buttons.
+     They simply replace the mapping of the five slots.
+  ======================================================= */
+
 
   clearButtons(){
 
     this.hal.clearButtons();
 
-    this.currentButtons=0;
-
   }
 
 
-  bindButton(label,callback){
+  bindButton(
+    index,
+    label,
+    callback
+  ){
 
-    if(this.currentButtons>=5){
+    if(
+      index<0 ||
+      index>4
+    ){
 
-      throw new Error(
-        "TAP input limit exceeded: maximum 5 buttons."
-      );
+      return false;
 
     }
 
-    const index=this.currentButtons++;
 
     this.hal.setButton(
       index,
@@ -492,28 +584,88 @@ class TAPCore{
       callback
     );
 
+    return true;
+
   }
 
 
-  /* -------------------------------------------------------
+  setButtons(buttons){
+
+    /*
+      Always replace ALL five mappings.
+
+      This is the critical fix.
+    */
+
+    this.clearButtons();
+
+
+    if(!Array.isArray(buttons)){
+
+      return;
+
+    }
+
+
+    for(
+      let i=0;
+      i<5;
+      i++
+    ){
+
+      const button=
+        buttons[i];
+
+
+      if(
+        !button
+      ){
+
+        this.bindButton(
+          i,
+          "—",
+          ()=>{}
+        );
+
+        continue;
+
+      }
+
+
+      this.bindButton(
+        i,
+        button.label || "—",
+        typeof button.action==="function"
+          ? button.action
+          : ()=>{}
+      );
+
+    }
+
+  }
+
+
+  /* =======================================================
      CARTRIDGE CONTEXT
-  ------------------------------------------------------- */
+  ======================================================= */
 
   makeContext(name){
 
     const core=this;
 
-    const cartridgeStoreKey=
+
+    const dataKey=
       "cartridge_data_"+name;
 
+
     let cartridgeData=
-      core.storage.get(cartridgeStoreKey)||{};
+      core.storage.get(dataKey)||{};
 
 
     function saveData(){
 
       core.storage.set(
-        cartridgeStoreKey,
+        dataKey,
         cartridgeData
       );
 
@@ -524,30 +676,41 @@ class TAPCore{
 
       version:"2.0",
 
+
+      /* ---------------------------------------------------
+         UI
+      --------------------------------------------------- */
+
       ui:{
 
         screen(text){
 
-          core.hal.setDisplay(text);
+          core.hal.setDisplay(
+            text
+          );
 
         },
 
+
         status(text){
 
-          core.hal.setStatus(text);
+          core.hal.setStatus(
+            text
+          );
 
         }
 
       },
 
 
+      /* ---------------------------------------------------
+         INPUT
+      --------------------------------------------------- */
+
       input:{
 
         /*
-          THIS IS THE IMPORTANT FIX.
-
-          Cartridges can now completely remap
-          the five physical buttons.
+          Clear all five physical slots.
         */
 
         clear(){
@@ -557,17 +720,80 @@ class TAPCore{
         },
 
 
+        /*
+          Legacy sequential API.
+
+          Each call fills one physical slot.
+          Maximum = five physical slots.
+        */
+
         button(label,callback){
 
+          if(
+            !tap.__buttonIndex
+          ){
+
+            tap.__buttonIndex=0;
+
+          }
+
+
+          const index=
+            tap.__buttonIndex;
+
+
+          if(index>=5){
+
+            throw new Error(
+              "TAP has 5 physical buttons. "+
+              "Use tap.input.clear() before "+
+              "creating a new mapping."
+            );
+
+          }
+
+
           core.bindButton(
+            index,
             label,
             callback
           );
+
+
+          tap.__buttonIndex++;
+
+        },
+
+
+        /*
+          Recommended API.
+
+          Atomically replaces the entire
+          five-button layout.
+        */
+
+        set(buttons){
+
+          core.setButtons(
+            buttons
+          );
+
+          /*
+            Reset legacy cursor so that
+            subsequent button() calls begin
+            from the beginning.
+          */
+
+          tap.__buttonIndex=0;
 
         }
 
       },
 
+
+      /* ---------------------------------------------------
+         STORAGE
+      --------------------------------------------------- */
 
       storage:{
 
@@ -581,6 +807,7 @@ class TAPCore{
         set(key,value){
 
           cartridgeData[key]=value;
+
           saveData();
 
         },
@@ -589,6 +816,7 @@ class TAPCore{
         remove(key){
 
           delete cartridgeData[key];
+
           saveData();
 
         },
@@ -597,12 +825,17 @@ class TAPCore{
         clear(){
 
           cartridgeData={};
+
           saveData();
 
         }
 
       },
 
+
+      /* ---------------------------------------------------
+         NAVIGATION
+      --------------------------------------------------- */
 
       navigation:{
 
@@ -614,6 +847,10 @@ class TAPCore{
 
       },
 
+
+      /* ---------------------------------------------------
+         SYSTEM
+      --------------------------------------------------- */
 
       system:{
 
@@ -632,6 +869,10 @@ class TAPCore{
 
       },
 
+
+      /* ---------------------------------------------------
+         TIME
+      --------------------------------------------------- */
 
       time:{
 
@@ -665,6 +906,7 @@ class TAPCore{
         cancel(id){
 
           clearTimeout(id);
+
           clearInterval(id);
 
         }
@@ -672,12 +914,22 @@ class TAPCore{
       },
 
 
+      /* ---------------------------------------------------
+         MESSAGE
+      --------------------------------------------------- */
+
       message(text){
 
-        core.hal.setStatus(text);
+        core.hal.setStatus(
+          text
+        );
 
       },
 
+
+      /* ---------------------------------------------------
+         LAUNCH
+      --------------------------------------------------- */
 
       onLaunch(fn){
 
@@ -688,14 +940,17 @@ class TAPCore{
     };
 
 
+    tap.__buttonIndex=0;
+
+
     return tap;
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      VALIDATION
-  ------------------------------------------------------- */
+  ======================================================= */
 
   validate(name,code){
 
@@ -714,7 +969,7 @@ class TAPCore{
 
     if(
       typeof code!=="string" ||
-      code.trim().length<1
+      !code.trim()
     ){
 
       throw new Error(
@@ -724,16 +979,22 @@ class TAPCore{
     }
 
 
-    if(code.length>50000){
+    if(
+      code.length>50000
+    ){
 
       throw new Error(
-        "Cartridge exceeds 50,000 character limit."
+        "Cartridge exceeds 50,000 characters."
       );
 
     }
 
 
-    if(!code.includes("tap.onLaunch")){
+    if(
+      !code.includes(
+        "tap.onLaunch"
+      )
+    ){
 
       throw new Error(
         "Cartridge must call tap.onLaunch()."
@@ -745,8 +1006,8 @@ class TAPCore{
     try{
 
       /*
-        Compilation test only.
-        The cartridge is NOT executed here.
+        Compile only.
+        Do NOT execute.
       */
 
       new Function(
@@ -757,7 +1018,8 @@ class TAPCore{
     }catch(error){
 
       throw new Error(
-        "Syntax error: "+error.message
+        "Syntax error: "+
+        error.message
       );
 
     }
@@ -765,13 +1027,15 @@ class TAPCore{
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      INSTALL
-  ------------------------------------------------------- */
+  ======================================================= */
 
   install(name,code){
 
-    name=name.trim();
+    name=
+      name.trim();
+
 
     this.validate(
       name,
@@ -787,31 +1051,32 @@ class TAPCore{
 
       builtin:false,
 
-      installedAt:Date.now()
+      installedAt:
+        Date.now()
 
     };
 
 
     this.saveRegistry();
 
-    return true;
-
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      LAUNCH
-  ------------------------------------------------------- */
+  ======================================================= */
 
   launch(name){
 
     const cartridge=
       this.cartridges[name];
 
+
     if(!cartridge){
 
       this.hal.setDisplay(
-        "CARTRIDGE NOT FOUND\n\n"+name
+        "CARTRIDGE NOT FOUND\n\n"+
+        name
       );
 
       return;
@@ -819,43 +1084,58 @@ class TAPCore{
     }
 
 
+    /*
+      Kill previous physical mapping.
+    */
+
     this.clearButtons();
 
+
     this.current=name;
+
 
     this.hal.setStatus(
       "RUNNING: "+name
     );
 
 
-    const tap=
-      this.makeContext(name);
-
-
     try{
 
-      /*
-        Cartridge execution happens here.
-      */
+      const tap=
+        this.makeContext(
+          name
+        );
 
-      const fn=
+
+      const program=
         new Function(
           "tap",
           cartridge.code
         );
 
 
-      fn(tap);
+      /*
+        Execute cartridge.
+      */
+
+      program(tap);
 
 
-      if(typeof tap.__launch!=="function"){
+      if(
+        typeof tap.__launch!=="function"
+      ){
 
         throw new Error(
-          "Cartridge did not register onLaunch()."
+          "Cartridge did not register "+
+          "tap.onLaunch()."
         );
 
       }
 
+
+      /*
+        Execute lifecycle.
+      */
 
       tap.__launch();
 
@@ -864,12 +1144,14 @@ class TAPCore{
 
       this.clearButtons();
 
+
       this.hal.setDisplay(
         "CARTRIDGE ERROR\n\n"+
         name+
         "\n\n"+
         error.message
       );
+
 
       this.hal.setStatus(
         "ERROR"
@@ -880,15 +1162,16 @@ class TAPCore{
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      HOME
-  ------------------------------------------------------- */
+  ======================================================= */
 
   home(){
 
     this.current=null;
 
     this.clearButtons();
+
 
     this.hal.setStatus(
       "TAP CORE V2"
@@ -899,72 +1182,85 @@ class TAPCore{
       "TAP CORE V2\n"+
       "────────────\n\n"+
       "CARTRIDGE COMPUTER\n\n"+
-      "1 CARTRIDGES\n"+
-      "2 SETTINGS\n"+
-      "3 MANAGER\n\n"+
-      "Choose a system function."
+      "Choose a system."
     );
 
 
-    this.bindButton(
-      "CART",
-      ()=>this.pick()
-    );
+    this.setButtons([
 
+      {
+        label:"CART",
+        action:()=>this.pick()
+      },
 
-    this.bindButton(
-      "SET",
-      ()=>this.settings()
-    );
+      {
+        label:"SET",
+        action:()=>this.settings()
+      },
 
+      {
+        label:"MANAGER",
+        action:()=>this.manager()
+      },
 
-    this.bindButton(
-      "MANAGER",
-      ()=>this.manager()
-    );
+      {
+        label:"—",
+        action:()=>{}
+      },
 
+      {
+        label:"—",
+        action:()=>{}
+      }
 
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
-
-
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
+    ]);
 
   }
 
 
-  /* -------------------------------------------------------
-     CARTRIDGE PICKER
-  ------------------------------------------------------- */
+  /* =======================================================
+     CARTRIDGE SELECT
+  ======================================================= */
 
   pick(){
 
-    this.clearButtons();
-
     const names=
-      Object.keys(this.cartridges);
+      Object.keys(
+        this.cartridges
+      );
 
 
-    if(names.length===0){
+    if(
+      names.length===0
+    ){
 
       this.hal.setDisplay(
         "NO CARTRIDGES\n\n"+
         "Import one below."
       );
 
-      this.bindButton(
-        "BACK",
-        ()=>this.home()
-      );
+
+      this.setButtons([
+
+        {
+          label:"BACK",
+          action:()=>this.home()
+        },
+
+        null,
+        null,
+        null,
+        null
+
+      ]);
 
       return;
 
     }
+
+
+    const shown=
+      names.slice(0,5);
 
 
     let text=
@@ -972,7 +1268,7 @@ class TAPCore{
       "────────────\n\n";
 
 
-    names.slice(0,5).forEach(
+    shown.forEach(
       (name,index)=>{
 
         text+=
@@ -985,130 +1281,142 @@ class TAPCore{
     );
 
 
-    this.hal.setDisplay(text);
+    this.hal.setDisplay(
+      text
+    );
 
 
-    names.slice(0,5).forEach(
-      (name)=>{
+    this.setButtons(
 
-        this.bindButton(
-          name,
-          ()=>this.launch(name)
-        );
+      shown.map(
+        name=>({
 
-      }
+          label:name,
+
+          action:()=>this.launch(name)
+
+        })
+      )
+
     );
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      MANAGER
-  ------------------------------------------------------- */
+  ======================================================= */
 
   manager(){
 
-    this.clearButtons();
+    const names=
+      Object.keys(
+        this.cartridges
+      );
+
+
+    let text=
+      "CARTRIDGE MANAGER\n"+
+      "────────────────\n\n";
+
+
+    if(names.length){
+
+      text+=
+        names
+          .map(
+            (n,i)=>
+              (i+1)+" "+n
+          )
+          .join("\n");
+
+    }else{
+
+      text+="NO CARTRIDGES";
+
+    }
+
 
     this.hal.setDisplay(
-      "CARTRIDGE MANAGER\n"+
-      "────────────\n\n"+
-      Object.keys(this.cartridges)
-        .map(
-          (n,i)=>
-            (i+1)+" "+n
-        )
-        .join("\n")+
-      "\n\nUse IMPORT below."
+      text
     );
 
 
-    this.bindButton(
-      "IMPORT",
-      ()=>this.openImport()
-    );
+    this.setButtons([
 
+      {
+        label:"IMPORT",
+        action:()=>this.openImport()
+      },
 
-    this.bindButton(
-      "LAUNCH",
-      ()=>this.pick()
-    );
+      {
+        label:"LAUNCH",
+        action:()=>this.pick()
+      },
 
+      {
+        label:"HOME",
+        action:()=>this.home()
+      },
 
-    this.bindButton(
-      "HOME",
-      ()=>this.home()
-    );
+      null,
 
+      null
 
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
-
-
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
+    ]);
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      SETTINGS
-  ------------------------------------------------------- */
+  ======================================================= */
 
   settings(){
 
-    this.clearButtons();
-
     this.hal.setDisplay(
+
       "SETTINGS\n"+
       "────────────\n\n"+
-      "TAP CORE V2\n"+
-      "5 physical inputs\n"+
-      "Dynamic button mapping\n"+
+      "TAP CORE V2\n\n"+
+      "5 physical buttons\n"+
+      "Dynamic remapping\n"+
       "Persistent storage\n"+
-      "50K cartridge limit"
+      "50K cartridge limit\n"+
+      "Contextual controls"
+
     );
 
 
-    this.bindButton(
-      "RESTORE",
-      ()=>this.restoreDefaults()
-    );
+    this.setButtons([
 
+      {
+        label:"RESTORE",
+        action:()=>this.restoreDefaults()
+      },
 
-    this.bindButton(
-      "WIPE",
-      ()=>this.confirmWipe()
-    );
+      {
+        label:"WIPE",
+        action:()=>this.confirmWipe()
+      },
 
+      {
+        label:"HOME",
+        action:()=>this.home()
+      },
 
-    this.bindButton(
-      "HOME",
-      ()=>this.home()
-    );
+      null,
 
+      null
 
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
-
-
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
+    ]);
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      POWER
-  ------------------------------------------------------- */
+  ======================================================= */
 
   powerCycle(){
 
@@ -1116,98 +1424,97 @@ class TAPCore{
 
     this.current=null;
 
+
     this.hal.setDisplay(
       "POWER CYCLE\n\n"+
-      "TAP CORE\n"+
       "RESTARTING..."
     );
 
 
     setTimeout(
-      ()=>this.home(),
+      ()=>{
+        this.home();
+      },
       600
     );
 
   }
 
 
-  /* -------------------------------------------------------
-     IMPORT UI
-  ------------------------------------------------------- */
+  /* =======================================================
+     IMPORT PANEL
+  ======================================================= */
 
   openImport(){
 
     document
-      .getElementById("importPanel")
-      .classList.remove("hidden");
+      .getElementById(
+        "importPanel"
+      )
+      .classList.remove(
+        "hidden"
+      );
+
 
     window.scrollTo({
-      top:document.body.scrollHeight,
+
+      top:
+        document.body.scrollHeight,
+
       behavior:"smooth"
+
     });
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      WIPE
-  ------------------------------------------------------- */
+  ======================================================= */
 
   confirmWipe(){
 
-    this.clearButtons();
-
     this.hal.setDisplay(
+
       "WIPE ALL DATA?\n\n"+
-      "THIS REMOVES\n"+
-      "ALL CARTRIDGES\n"+
-      "AND SAVES."
+      "THIS REMOVES ALL\n"+
+      "CARTRIDGES AND SAVES."
+
     );
 
 
-    this.bindButton(
-      "YES",
-      ()=>{
+    this.setButtons([
 
-        this.storage.clear();
+      {
+        label:"YES",
+        action:()=>{
 
-        this.cartridges={};
+          this.storage.clear();
 
-        this.home();
+          this.cartridges={};
 
-      }
-    );
+          this.home();
 
+        }
+      },
 
-    this.bindButton(
-      "NO",
-      ()=>this.settings()
-    );
+      {
+        label:"NO",
+        action:()=>this.settings()
+      },
 
+      null,
+      null,
+      null
 
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
-
-
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
-
-
-    this.bindButton(
-      "—",
-      ()=>{}
-    );
+    ]);
 
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      DEFAULT CARTRIDGE
-  ------------------------------------------------------- */
+  ======================================================= */
 
   restoreDefaults(){
 
@@ -1218,51 +1525,68 @@ class TAPCore{
       builtin:true,
 
       code:`
+
 tap.onLaunch(()=>{
 
   let count=0;
 
-  function show(){
+  function draw(){
 
     tap.ui.screen(
-      "TAP TEST\\n\\n"+
-      "PRESS TEST\\n\\n"+
-      "COUNT: "+count
+      "TAP TEST\\n"+
+      "────────\\n\\n"+
+      "COUNT: "+count+
+      "\\n\\n"+
+      "Press TEST."
     );
 
   }
 
-  tap.input.clear();
 
-  tap.input.button(
-    "TEST",
-    ()=>{
-      count++;
-      show();
-    }
-  );
+  tap.input.set([
 
-  tap.input.button(
-    "RESET",
-    ()=>{
-      count=0;
-      show();
-    }
-  );
+    {
+      label:"TEST",
+      action:()=>{
 
-  tap.input.button(
-    "HOME",
-    ()=>{
-      tap.navigation.home();
-    }
-  );
+        count++;
 
-  tap.input.button("—",()=>{});
-  tap.input.button("—",()=>{});
+        draw();
 
-  show();
+      }
+    },
+
+    {
+      label:"RESET",
+      action:()=>{
+
+        count=0;
+
+        draw();
+
+      }
+    },
+
+    {
+      label:"HOME",
+      action:()=>{
+
+        tap.navigation.home();
+
+      }
+    },
+
+    null,
+
+    null
+
+  ]);
+
+
+  draw();
 
 });
+
 `
 
     };
@@ -1270,20 +1594,30 @@ tap.onLaunch(()=>{
 
     this.saveRegistry();
 
+
     this.hal.setDisplay(
       "DEFAULT RESTORED\n\n"+
       "TAP TEST installed."
     );
 
-    this.bindButton(
-      "LAUNCH",
-      ()=>this.launch("TAP TEST")
-    );
 
-    this.bindButton(
-      "HOME",
-      ()=>this.home()
-    );
+    this.setButtons([
+
+      {
+        label:"LAUNCH",
+        action:()=>this.launch("TAP TEST")
+      },
+
+      {
+        label:"HOME",
+        action:()=>this.home()
+      },
+
+      null,
+      null,
+      null
+
+    ]);
 
   }
 
@@ -1291,10 +1625,11 @@ tap.onLaunch(()=>{
 
 
 /* =========================================================
-   CREATE CORE
+   START TAP
 ========================================================= */
 
-const TAP=new TAPCore();
+const TAP=
+  new TAPCore();
 
 
 /* =========================================================
@@ -1337,17 +1672,25 @@ document
 
       const name=
         document
-          .getElementById("cartName")
+          .getElementById(
+            "cartName"
+          )
           .value;
+
 
       const code=
         document
-          .getElementById("cartCode")
+          .getElementById(
+            "cartCode"
+          )
           .value;
+
 
       const result=
         document
-          .getElementById("importResult");
+          .getElementById(
+            "importResult"
+          );
 
 
       try{
@@ -1360,6 +1703,7 @@ document
 
         result.className="ok";
 
+
         result.textContent=
           "IMPORT ✓\n"+
           "VALIDATE ✓\n"+
@@ -1370,17 +1714,23 @@ document
 
 
         document
-          .getElementById("cartName")
+          .getElementById(
+            "cartName"
+          )
           .value="";
 
+
         document
-          .getElementById("cartCode")
+          .getElementById(
+            "cartCode"
+          )
           .value="";
 
 
       }catch(error){
 
         result.className="err";
+
 
         result.textContent=
           "IMPORT ✗\n\n"+
@@ -1392,11 +1742,13 @@ document
 
 
 /* =========================================================
-   AUTO-LOAD A BASIC TEST IF NONE EXIST
+   DEFAULT BOOT
 ========================================================= */
 
 if(
-  Object.keys(TAP.cartridges).length===0
+  Object.keys(
+    TAP.cartridges
+  ).length===0
 ){
 
   TAP.restoreDefaults();
